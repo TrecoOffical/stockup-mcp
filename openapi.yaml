@@ -1,0 +1,121 @@
+openapi: 3.0.3
+info:
+  title: StockUp Quan AI API
+  description: API connecting generative AI models with real-time financial data, key-free stock quotes, and quantitative reasoning models.
+  version: 1.0.0
+servers:
+  - url: https://stockup-4ab83.web.app
+    description: Production Server
+  - url: http://127.0.0.1:5001/stockup-4ab83/us-central1
+    description: Local Firebase Emulator
+paths:
+  /quanPublicApi:
+    post:
+      summary: Query Financial Intelligence LLM
+      description: Submits a query to the StockUp Quan financial model grounded with live Yahoo Finance stock quote streams.
+      operationId: queryQuanModel
+      security:
+        - ApiKeyAuth: []
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QueryRequest'
+      responses:
+        '200':
+          description: Successful query execution
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QueryResponse'
+            text/event-stream:
+              description: Server-Sent Events (SSE) stream chunks when stream is true
+        '401':
+          description: Unauthorized - API key invalid or missing
+        '402':
+          description: Payment Required - Insufficient prepaid wallet balance
+        '500':
+          description: Internal server error
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key
+      description: Custom API key authentication (e.g. sk_quan_...)
+    BearerAuth:
+      type: http
+      scheme: bearer
+      description: Standard Bearer Authorization token
+  schemas:
+    QueryRequest:
+      type: object
+      required:
+        - messages
+      properties:
+        model:
+          type: string
+          enum:
+            - quan-3.0
+            - quan-3.3
+            - quan-3.3-deep-research
+          default: quan-3.3
+          description: Variation of the model to use. quan-3.0 is fast/lite, quan-3.3 standard reasoning, quan-3.3-deep-research is advanced deep portfolio research.
+        messages:
+          type: array
+          description: Conversational history messages array in OpenAI/Gemini chat format.
+          items:
+            $ref: '#/components/schemas/Message'
+        stream:
+          type: boolean
+          default: true
+          description: Whether to stream chunk responses back using Server-Sent Events.
+        googleSearch:
+          type: boolean
+          default: true
+          description: Whether to enable live Google Search grounding. Billed at +$0.02 per query on quan-3.3/deep-research.
+        temperature:
+          type: number
+          minimum: 0
+          maximum: 2
+          default: 0.2
+          description: Sampling temperature. Lower values are more deterministic.
+    Message:
+      type: object
+      required:
+        - role
+        - content
+      properties:
+        role:
+          type: string
+          enum:
+            - user
+            - assistant
+          description: The speaker role.
+        content:
+          type: string
+          description: The textual body content of the message.
+    QueryResponse:
+      type: object
+      properties:
+        candidates:
+          type: array
+          items:
+            type: object
+            properties:
+              content:
+                type: object
+                properties:
+                  parts:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        text:
+                          type: string
+                          description: The generated markdown text response.
+                  role:
+                    type: string
+                    example: model
