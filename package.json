@@ -1,0 +1,17 @@
+{
+  "name": "stockup-mcp",
+  "version": "1.0.0",
+  "description": "Exposes StockUp Quan's grounded financial intelligence model to Claude Desktop, Cursor, and other MCP clients.",
+  "main": "stockup-mcp.js",
+  "bin": {
+    "stockup-mcp": "./stockup-mcp.js"
+  },
+  "scripts": {
+    "start": "node stockup-mcp.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {},
+  "private": true
+}
