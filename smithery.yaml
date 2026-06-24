@@ -1,0 +1,17 @@
+# Smithery.ai configuration for StockUp MCP
+startCommand:
+  type: stdio
+configSchema:
+  type: object
+  required: [STOCKUP_API_KEY]
+  properties:
+    STOCKUP_API_KEY:
+      type: string
+      title: "StockUp API Key"
+      description: "Your StockUp Quan API Key (starts with sk_quan_)"
+commandFunction: |-
+  (config) => ({
+    command: 'node',
+    args: ['stockup-mcp.js'],
+    env: { STOCKUP_API_KEY: config.STOCKUP_API_KEY }
+  })
