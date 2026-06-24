@@ -1,0 +1,46 @@
+{
+  "mcpPlatforms": [
+    "stdio"
+  ],
+  "name": "stockup-mcp",
+  "version": "1.0.0",
+  "description": "Exposes StockUp Quan's grounded financial intelligence model to Claude Desktop, Cursor, and other MCP clients.",
+  "tools": [
+    {
+      "name": "financial_reasoning_query",
+      "description": "Send natural language financial prompts grounded with real-time stock quotes from Yahoo Finance.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "prompt": {
+            "type": "string",
+            "description": "The detailed financial query or stock research prompt to run."
+          },
+          "model": {
+            "type": "string",
+            "enum": [
+              "quan-3.0",
+              "quan-3.3",
+              "quan-3.3-deep-research"
+            ],
+            "default": "quan-3.3",
+            "description": "Model variant to use."
+          },
+          "googleSearch": {
+            "type": "boolean",
+            "default": true,
+            "description": "Whether to enable live Google Search grounding."
+          },
+          "temperature": {
+            "type": "number",
+            "default": 0.2,
+            "description": "Sampling temperature."
+          }
+        },
+        "required": [
+          "prompt"
+        ]
+      }
+    }
+  ]
+}
